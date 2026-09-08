@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Camino de las Tablas Mágicas — Samantha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ice-1:#eaf6ff;
+    --ice-2:#bfe3ff;
+    --ice-3:#8fb8f0;
+    --ice-accent:#3d8bd4;
+    --ice-deep:#274b8a;
+    --shadow-1:#5b3aa0;
+    --shadow-2:#7b2fbf;
+    --shadow-3:#c4408a;
+    --shadow-accent:#ff7a45;
+    --gold:#ffb703;
+    --gold-dark:#e08e00;
+    --ink:#241f3d;
+    --card:#ffffff;
+    --success:#2fb872;
+    --success-dark:#1f8f57;
+    --oops:#ff8a5c;
+    --oops-dark:#e8672f;
+    --candy:#ff6fa5;
+  }
+  *{box-sizing:border-box;}
+  html{font-size:18px;}
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+    background: linear-gradient(180deg, var(--ice-1) 0%, var(--ice-2) 20%, var(--ice-3) 38%, #cfa8e8 52%, var(--shadow-1) 68%, var(--shadow-2) 84%, var(--shadow-3) 100%);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  h1,h2,h3, .display{ font-family:'Baloo 2', cursive; }
+  button{ font-family:inherit; }
+  #app{ max-width:540px; margin:0 auto; padding:18px 16px 60px; min-height:100vh; position:relative; }
+
+  /* ---------- TOPBAR ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background:rgba(255,255,255,0.8); backdrop-filter: blur(6px);
+    border-radius:999px; padding:8px 10px 8px 16px;
+    box-shadow:0 4px 16px rgba(40,30,80,0.15);
+    position:sticky; top:10px; z-index:30;
+  }
+  .brand{ font-family:'Baloo 2', cursive; font-weight:800; font-size:1.05rem; color:var(--ice-deep); line-height:1.15; }
+  .brand span{ display:block; font-size:0.68rem; font-weight:700; color:#6a5fa0; font-family:'Nunito',sans-serif; }
+  .stats{ display:flex; align-items:center; gap:8px; }
+  .pill{ display:flex; align-items:center; gap:5px; background:#fff; border-radius:999px; padding:6px 11px; font-weight:800; font-size:0.92rem; box-shadow:inset 0 0 0 2px rgba(0,0,0,0.04); }
+  .pill.stars{color:var(--gold-dark);}
+  .pill.badges{color:var(--shadow-2);}
+  .gear-btn{
+    width:38px;height:38px; border-radius:50%; border:none; background:#f1eef8;
+    font-size:1.15rem; cursor:pointer; flex-shrink:0;
+  }
+
+  h1.title{ text-align:center; font-size:1.7rem; margin:24px 0 4px; color:var(--ice-deep); text-shadow:0 2px 0 rgba(255,255,255,0.6); }
+  p.subtitle{ text-align:center; margin:0 0 22px; color:#443b73; font-weight:800; font-size:1.02rem; line-height:1.5; }
+
+  /* ---------- MAP ---------- */
+  #path-map{ position:relative; margin-top:10px; }
+  #path-svg{ position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; }
+  .level-node{ position:absolute; width:96px; transform:translate(-50%,-50%); z-index:2; display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; user-select:none; }
+  .level-node.locked{ cursor:not-allowed; }
+  .node-circle{
+    width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'Baloo 2', cursive; font-size:1.7rem; font-weight:800; color:#fff;
+    box-shadow:0 6px 14px rgba(30,20,60,0.28), inset 0 -4px 0 rgba(0,0,0,0.15);
+    border:4px solid #fff; position:relative; transition:transform .15s ease;
+  }
+  .level-node.boss .node-circle{ width:78px; height:78px; }
+  .level-node:not(.locked):active .node-circle{ transform:scale(0.93); }
+  .level-node.locked .node-circle{ background:#b9b3c9 !important; box-shadow:0 4px 10px rgba(30,20,60,0.15), inset 0 -4px 0 rgba(0,0,0,0.1); }
+  .node-circle .lock{ font-size:1.5rem; }
+  .node-circle.current{ animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ box-shadow:0 6px 14px rgba(30,20,60,0.28), 0 0 0 0 rgba(255,183,3,0.6);} 50%{ box-shadow:0 6px 14px rgba(30,20,60,0.28), 0 0 0 12px rgba(255,183,3,0);} }
+  .node-label{ font-weight:800; font-size:0.82rem; color:#3a3260; background:rgba(255,255,255,0.9); padding:3px 9px; border-radius:999px; white-space:nowrap; text-align:center; }
+  .node-monster{ font-size:0.72rem; font-weight:700; color:#5a4f8a; }
+  .node-stars{ display:flex; gap:1px; font-size:0.82rem; filter:drop-shadow(0 1px 1px rgba(0,0,0,0.2)); }
+  .node-stars .star-empty{ opacity:0.35; }
+
+  /* ---------- OVERLAYS (genéricas) ---------- */
+  .overlay{ display:none; position:fixed; inset:0; z-index:60; background:linear-gradient(180deg, rgba(20,10,40,0.55), rgba(20,10,40,0.8)); align-items:center; justify-content:center; padding:16px; }
+  .overlay.active{ display:flex; }
+  .overlay.bottom{ align-items:flex-end; }
+  .card{
+    width:100%; max-width:520px; background:var(--card); border-radius:26px; padding:24px 22px 26px;
+    max-height:92vh; overflow-y:auto; box-shadow:0 -10px 30px rgba(0,0,0,0.3);
+    animation: popIn .25s ease-out;
+  }
+  .overlay.bottom .card{ border-radius:26px 26px 0 0; animation: slideUp .28s ease-out; }
+  @keyframes slideUp{ from{transform:translateY(40px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+  @keyframes popIn{ from{transform:scale(0.92); opacity:0;} to{transform:scale(1); opacity:1;} }
+
+  .center-text{ text-align:center; }
+  .big-emoji{ font-size:3.6rem; margin-bottom:6px; }
+
+  /* Loading */
+  #loading-screen .card{ text-align:center; }
+  .spinner{
+    width:52px; height:52px; border-radius:50%;
+    border:6px solid #e7e3f4; border-top-color:var(--shadow-2);
+    margin:0 auto 16px; animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+
+  /* Companion choice */
+  .companion-grid{ display:flex; gap:14px; margin-top:18px; }
+  .companion-card{
+    flex:1; border:4px solid #e7e3f4; border-radius:22px; padding:18px 10px; text-align:center;
+    cursor:pointer; background:#fbfaff; transition:all .15s ease;
+  }
+  .companion-card:active{ transform:scale(0.96); }
+  .companion-card .avatar-lg{
+    width:76px; height:76px; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;
+    font-size:2.1rem; border:4px solid #fff; box-shadow:0 6px 14px rgba(0,0,0,0.2);
+  }
+  .companion-card h3{ margin:0 0 4px; font-size:1.15rem; }
+  .companion-card p{ margin:0; font-size:0.85rem; color:#5a4f8a; font-weight:700; line-height:1.4; }
+
+  /* Story */
+  .story-text{ font-size:1.08rem; font-weight:700; color:#443b73; line-height:1.6; margin-bottom:10px; }
+
+  .big-btn{
+    display:block; width:100%; margin-top:18px; padding:16px; border:none; border-radius:18px;
+    font-family:'Baloo 2', cursive; font-weight:800; font-size:1.15rem; color:#fff; cursor:pointer;
+    background:var(--gold-dark); box-shadow:0 6px 0 #a86800;
+  }
+  .big-btn:active{ transform:translateY(3px); box-shadow:0 3px 0 #a86800; }
+  .big-btn.purple{ background:var(--shadow-2); box-shadow:0 6px 0 #4a1f80; }
+  .big-btn.purple:active{ box-shadow:0 3px 0 #4a1f80; }
+  .big-btn.green{ background:var(--success); box-shadow:0 6px 0 var(--success-dark); }
+  .big-btn.green:active{ box-shadow:0 3px 0 var(--success-dark); }
+  .big-btn.danger{ background:var(--oops-dark); box-shadow:0 6px 0 #a83d16; }
+  .big-btn.ghost{ background:#f1eef8; color:#5a4f8a; box-shadow:none; }
+
+  /* Mission intro */
+  .mission-tag{ display:inline-block; font-weight:800; font-size:0.85rem; padding:6px 14px; border-radius:999px; color:#fff; margin-bottom:10px; }
+  .mission-title{ font-size:1.5rem; margin:0 0 12px; color:var(--ice-deep); }
+  .monster-banner{
+    display:flex; align-items:center; gap:14px; background:#f4f1fc; border-radius:18px; padding:14px 16px; margin-bottom:14px;
+  }
+  .monster-emoji{ font-size:2.6rem; }
+  .monster-name{ font-weight:800; font-size:1.05rem; color:#3a3260; }
+  .monster-sub{ font-weight:700; font-size:0.85rem; color:#6a5fa0; }
+  .mission-narrative{ font-size:1.05rem; font-weight:700; color:#443b73; line-height:1.55; margin-bottom:16px; }
+  .tip-box{
+    background:linear-gradient(135deg, #fff6df, #ffe9b8); border-radius:18px; padding:14px 16px; margin-bottom:6px;
+    border:2px dashed var(--gold-dark);
+  }
+  .tip-box h4{ margin:0 0 6px; font-size:1rem; color:#8a5a00; display:flex; align-items:center; gap:6px; }
+  .tip-box p{ margin:0; font-weight:700; font-size:0.98rem; color:#6b4a00; line-height:1.5; }
+
+  /* Level (quiz) view */
+  .level-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:8px; }
+  .close-btn{ background:#f1eef8; border:none; width:40px;height:40px; border-radius:50%; font-size:1.2rem; color:#6a5fa0; cursor:pointer; font-weight:800; flex-shrink:0; }
+  .header-tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .level-tag{ font-weight:800; font-size:0.82rem; padding:6px 13px; border-radius:999px; color:#fff; }
+  .tip-toggle{ background:#fff6df; border:2px solid var(--gold-dark); color:#8a5a00; font-weight:800; font-size:0.78rem; padding:5px 11px; border-radius:999px; cursor:pointer; }
+
+  .inline-tip{ display:none; background:linear-gradient(135deg, #fff6df, #ffe9b8); border-radius:16px; padding:12px 14px; margin:10px 0; font-weight:700; font-size:0.95rem; color:#6b4a00; border:2px dashed var(--gold-dark); }
+  .inline-tip.show{ display:block; animation: fadeIn .2s ease; }
+
+  .character-row{ display:flex; align-items:center; gap:12px; margin:14px 0 12px; }
+  .avatar{ width:62px;height:62px; border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:1.8rem; border:3px solid #fff; box-shadow:0 4px 10px rgba(0,0,0,0.18); flex-shrink:0; }
+  .speech{ background:#f4f1fc; border-radius:16px; padding:12px 15px; font-weight:700; font-size:1.02rem; color:#3a3260; flex:1; line-height:1.4; }
+
+  .progress-track{ display:flex; gap:4px; margin:14px 0 20px; }
+  .progress-dot{ flex:1; height:10px; border-radius:999px; background:#e7e3f4; }
+  .progress-dot.done{ background:var(--success); }
+  .progress-dot.retry{ background:var(--gold); }
+
+  .question-box{ text-align:center; margin-bottom:18px; }
+  .question-box .op{ font-family:'Baloo 2', cursive; font-size:2.7rem; font-weight:800; color:var(--ink); }
+  .options-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .option-btn{ font-family:'Baloo 2', cursive; font-size:1.7rem; font-weight:700; padding:18px 8px; border-radius:18px; border:3px solid #e7e3f4; background:#fff; color:var(--ink); cursor:pointer; transition: all .12s ease; }
+  .option-btn:hover{ border-color:var(--ice-accent); }
+  .option-btn.correct{ background:var(--success); border-color:var(--success-dark); color:#fff; }
+  .option-btn.wrong{ background:var(--oops); border-color:var(--oops-dark); color:#fff; }
+  .option-btn:disabled{ cursor:default; }
+  .option-btn:disabled:not(.correct):not(.wrong){ opacity:0.5; }
+
+  .feedback-panel{ margin-top:18px; border-radius:20px; padding:18px; display:none; }
+  .feedback-panel.show{ display:block; animation: fadeIn .2s ease; }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+  .feedback-panel.good{ background:#e6f8ef; }
+  .feedback-panel.oops{ background:#fff3ec; }
+  .feedback-title{ font-family:'Baloo 2', cursive; font-weight:800; font-size:1.25rem; margin-bottom:8px; }
+  .feedback-panel.good .feedback-title{ color:var(--success-dark); }
+  .feedback-panel.oops .feedback-title{ color:var(--oops-dark); }
+  .feedback-text{ font-weight:700; font-size:1.02rem; color:#4c4370; margin-bottom:10px; line-height:1.5; }
+  .dot-grid{ display:flex; flex-direction:column; gap:5px; margin:12px 0; align-items:center; }
+  .dot-row{ display:flex; gap:5px; flex-wrap:wrap; justify-content:center; }
+  .dot{ font-size:1.3rem; line-height:1; }
+  .addition-line{ text-align:center; font-weight:800; font-size:1.08rem; color:var(--ice-deep); margin-top:8px; }
+  .answer-line{ text-align:center; font-family:'Baloo 2', cursive; font-weight:800; font-size:1.4rem; color:var(--candy); margin-top:10px; background:#fff; border-radius:14px; padding:10px; }
+  .next-btn{ display:block; width:100%; margin-top:16px; padding:16px; border:none; border-radius:18px; font-family:'Baloo 2', cursive; font-weight:800; font-size:1.12rem; color:#fff; cursor:pointer; }
+  .next-btn.good{ background:var(--success); }
+  .next-btn.oops{ background:var(--oops-dark); }
+
+  /* Reward */
+  .reward-badge{ width:130px;height:130px; border-radius:50%; margin:6px auto 14px; display:flex;align-items:center;justify-content:center; font-size:3.4rem; border:6px solid #fff; box-shadow:0 8px 20px rgba(0,0,0,0.25); }
+  .reward-stars{ font-size:2.3rem; margin-bottom:8px; letter-spacing:5px; }
+  .reward-title{ font-size:1.55rem; margin:0 0 10px; color:var(--ice-deep); }
+  .reward-text{ font-weight:700; color:#4c4370; margin-bottom:22px; font-size:1.02rem; line-height:1.55; }
+  .reward-actions{ display:flex; gap:10px; }
+  .reward-actions button{ flex:1; padding:15px; border-radius:16px; border:none; font-family:'Baloo 2', cursive; font-weight:800; font-size:1rem; cursor:pointer; }
+  .btn-secondary{ background:#f1eef8; color:#6a5fa0; }
+  .btn-primary{ background:var(--gold); color:#5a3d00; }
+
+  .confetti{ position:absolute; top:-10px; font-size:1.3rem; animation: fall linear forwards; }
+  @keyframes fall{ to{ transform:translateY(440px) rotate(360deg); opacity:0; } }
+
+  /* Settings */
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:2px solid #f1eef8; font-weight:800; font-size:1rem; color:#3a3260; }
+  .settings-row:last-of-type{ border-bottom:none; }
+
+  footer.note{ text-align:center; font-size:0.8rem; color:#5a4f8a; margin-top:32px; opacity:0.9; font-weight:700; line-height:1.6; }
+
+  @media (max-width:360px){
+    .level-node{ width:82px; }
+    .node-circle{ width:60px; height:60px; font-size:1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="topbar">
+    <div class="brand">Camino de las Tablas<span id="player-tagline">La aventura de Samantha</span></div>
+    <div class="stats">
+      <div class="pill stars">⭐ <span id="star-count">0</span></div>
+      <div class="pill badges">🏅 <span id="badge-count">0</span>/10</div>
+      <button class="gear-btn" onclick="openSettings()">⚙️</button>
+    </div>
+  </div>
+
+  <h1 class="title">✨ El Camino de las Tablas Mágicas ✨</h1>
+  <p class="subtitle" id="main-subtitle">Samantha se embarca en una aventura para derrotar a Caos.</p>
+
+  <div id="path-map"></div>
+
+  <footer class="note">Toca una misión desbloqueada para jugarla.<br>Debes dominar su tabla para abrir la siguiente.</footer>
+</div>
+
+<!-- LOADING -->
+<div class="overlay active" id="loading-screen">
+  <div class="card center-text">
+    <div class="spinner"></div>
+    <p class="story-text">Cargando tu aventura, Samantha...</p>
+  </div>
+</div>
+
+<!-- COMPANION CHOICE -->
+<div class="overlay" id="companion-screen">
+  <div class="card center-text">
+    <div class="big-emoji">👋</div>
+    <h2 class="mission-title">¡Hola, Samantha!</h2>
+    <p class="story-text">Antes de empezar, elige a tu compañera de aventura. Ella te acompañará en cada misión.</p>
+    <div class="companion-grid">
+      <div class="companion-card" onclick="chooseCompanion('ice')">
+        <div class="avatar-lg" style="background:linear-gradient(135deg, var(--ice-accent), var(--ice-deep));">❄️</div>
+        <h3>Nívea</h3>
+        <p>Guardiana del Hielo. Tranquila, sabia y protectora.</p>
+      </div>
+      <div class="companion-card" onclick="chooseCompanion('shadow')">
+        <div class="avatar-lg" style="background:linear-gradient(135deg, var(--shadow-3), var(--shadow-2));">🗡️</div>
+        <h3>Luma</h3>
+        <p>Cazadora de Sombras. Valiente, veloz y decidida.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STORY INTRO -->
+<div class="overlay" id="story-screen">
+  <div class="card">
+    <div class="center-text big-emoji">🧙‍♂️💜</div>
+    <h2 class="mission-title center-text">La leyenda de Caos</h2>
+    <p class="story-text">Hace mucho tiempo, un hechicero llamado <strong>Caos</strong> le robó a los números su memoria. Desde entonces, los números olvidaron a sus compañeros de multiplicación y el Reino se llenó de criaturas confundidas que bloquean los caminos.</p>
+    <p class="story-text" id="story-companion-line">Nívea te ha elegido como su ayudante, Samantha. Juntas recorrerán 10 misiones, una por cada tabla, sellando a las criaturas confundidas y devolviéndole la memoria al Reino.</p>
+    <p class="story-text">Al final del camino, en el Trono Final, tendrán que enfrentar al mismísimo Caos. ¿Estás lista?</p>
+    <button class="big-btn purple" onclick="beginMap()">¡Comenzar la aventura!</button>
+  </div>
+</div>
+
+<!-- MISSION INTRO -->
+<div class="overlay bottom" id="mission-screen">
+  <div class="card">
+    <div class="level-header">
+      <span class="mission-tag" id="mission-tag">Misión 1</span>
+      <button class="close-btn" onclick="closeMissionIntro()">✕</button>
+    </div>
+    <h2 class="mission-title" id="mission-title">Sendero de Copos</h2>
+    <div class="monster-banner">
+      <div class="monster-emoji" id="monster-emoji">🌀</div>
+      <div>
+        <div class="monster-name" id="monster-name">Copito Confundido</div>
+        <div class="monster-sub" id="monster-sub">Bloquea el camino</div>
+      </div>
+    </div>
+    <p class="mission-narrative" id="mission-narrative">Un Copito Confundido bloquea el Sendero de Copos.</p>
+    <div class="tip-box">
+      <h4>💡 Truco para memorizar esta tabla</h4>
+      <p id="mission-tip">Consejo aquí</p>
+    </div>
+    <button class="big-btn green" onclick="startMission()">¡Comenzar misión!</button>
+  </div>
+</div>
+
+<!-- LEVEL / QUIZ VIEW -->
+<div class="overlay bottom" id="level-view">
+  <div class="card">
+    <div class="level-header">
+      <div class="header-tags">
+        <span class="level-tag" id="level-tag">Tabla del 1</span>
+        <button class="tip-toggle" onclick="toggleTip()">💡 Consejo</button>
+      </div>
+      <button class="close-btn" onclick="closeLevel()">✕</button>
+    </div>
+
+    <div class="inline-tip" id="inline-tip"></div>
+
+    <div class="character-row">
+      <div class="avatar" id="char-avatar">❄️</div>
+      <div class="speech" id="char-speech">¡Vamos a practicar juntas, Samantha!</div>
+    </div>
+
+    <div class="progress-track" id="progress-track"></div>
+
+    <div class="question-box">
+      <div class="op" id="question-op">3 × 4 = ?</div>
+    </div>
+
+    <div class="options-grid" id="options-grid"></div>
+
+    <div class="feedback-panel" id="feedback-panel">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-text" id="feedback-text"></div>
+      <div class="dot-grid" id="dot-grid"></div>
+      <div class="addition-line" id="addition-line"></div>
+      <div class="answer-line" id="answer-line" style="display:none;"></div>
+      <button class="next-btn good" id="next-btn" onclick="nextQuestion()">Siguiente</button>
+    </div>
+  </div>
+</div>
+
+<!-- REWARD VIEW -->
+<div class="overlay bottom" id="reward-view">
+  <div class="card center-text" id="reward-sheet-inner" style="position:relative; overflow:hidden;">
+    <div class="reward-badge" id="reward-badge">🏅</div>
+    <div class="reward-stars" id="reward-stars">⭐⭐⭐</div>
+    <h2 class="reward-title" id="reward-title">¡Tabla del 1 dominada!</h2>
+    <p class="reward-text" id="reward-text">Has abierto la siguiente misión.</p>
+    <div class="reward-actions">
+      <button class="btn-secondary" onclick="replayLevel()">Practicar de nuevo</button>
+      <button class="btn-primary" onclick="backToMap()">Volver al camino</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="overlay" id="settings-screen">
+  <div class="card">
+    <div class="level-header">
+      <h2 class="mission-title" style="margin:0;">⚙️ Ajustes</h2>
+      <button class="close-btn" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-row"><span>Jugadora</span><span>Samantha</span></div>
+    <div class="settings-row"><span>Compañera actual</span><span id="settings-companion">—</span></div>
+    <button class="big-btn purple" onclick="startChangeCompanion()">Cambiar de compañera</button>
+    <button class="big-btn danger" onclick="askResetConfirm()">Reiniciar mi progreso</button>
+  </div>
+</div>
+
+<!-- CONFIRM RESET -->
+<div class="overlay" id="confirm-screen">
+  <div class="card center-text">
+    <div class="big-emoji">🤔</div>
+    <h2 class="mission-title">¿Reiniciar todo?</h2>
+    <p class="story-text">Vas a borrar todas tus estrellas y misiones completadas, Samantha. ¿Quieres empezar el camino desde cero?</p>
+    <button class="big-btn danger" onclick="doReset()">Sí, reiniciar</button>
+    <button class="big-btn ghost" onclick="closeConfirm()">No, mejor no</button>
+  </div>
+</div>
+
+<script>
+/* ============ CONFIGURACIÓN DE LA JUGADORA ============ */
+const PLAYER_NAME = "Samantha";
+const COMPANION_KEY = "samantha-companera";
+const PROGRESS_KEY = "samantha-progreso";
+
+/* ============ DATOS DEL JUEGO ============ */
+const COMPANIONS = {
+  ice:    { key:'ice',    name:'Nívea', emoji:'❄️', bg:'linear-gradient(135deg, var(--ice-accent), var(--ice-deep))' },
+  shadow: { key:'shadow', name:'Luma',  emoji:'🗡️', bg:'linear-gradient(135deg, var(--shadow-3), var(--shadow-2))' }
+};
+
+const ICE_MSGS = [
+  "¡Los copos de nieve se forman en grupos iguales, igual que la multiplicación!",
+  "Respira hondo, Samantha. El hielo nunca tiene prisa, tú tampoco.",
+  "¡Cada acierto se convierte en un cristal para tu corona!",
+  "Confío en ti, exploradora del hielo."
+];
+const SHADOW_MSGS = [
+  "Las sombras solo se vencen con concentración, ¡como tú!",
+  "Cada acierto es una chispa de luz en la oscuridad.",
+  "¡Con cada tabla dominada, tu espada brilla más fuerte!",
+  "No temas fallar, Samantha. Hasta las mejores cazadoras entrenan mucho."
+];
+
+const TIPS = {
+  1:  "Multiplicar por 1 no cambia nada. ¡El número se queda igual, como mirarse en un espejo!",
+  2:  "Multiplicar por 2 es sumar el número dos veces (el doble). Ejemplo: 6×2 = 6+6 = 12.",
+  3:  "Suma el número tres veces. También puedes contar de 3 en 3: 3, 6, 9, 12, 15...",
+  4:  "Es doblar dos veces seguidas: primero duplica el número, y luego duplica ese resultado.",
+  5:  "Todas las respuestas terminan en 0 o en 5. ¡Cuenta de 5 en 5 con tus dedos!",
+  6:  "Es el doble de la tabla del 3. Si ya sabes el 3, ¡ya casi sabes el 6!",
+  7:  "La más retadora. Truco: usa la tabla del 5 y súmale dos veces más el número. Ej: 7×4 = (5×4)+(2×4) = 20+8 = 28.",
+  8:  "Duplica tres veces seguidas (2, luego 4, luego 8). También es el doble de la tabla del 4.",
+  9:  "Truco de los dedos: extiende tus 10 dedos y baja el que coincide con el número. Los dedos a la izquierda son las decenas, los de la derecha las unidades.",
+  10: "¡La más fácil de todas! Solo agrega un 0 al número. Ejemplo: 10×7 = 70."
+};
+
+const LEVELS_TEMPLATE = [
+  {n:1,  zone:'ice',    title:'Sendero de Copos',     monster:{name:'Copito Confundido',     emoji:'🌀', boss:false}},
+  {n:2,  zone:'ice',    title:'Puente de Escarcha',   monster:{name:'Nube Revoltosa',        emoji:'🌫️', boss:false}},
+  {n:3,  zone:'ice',    title:'Bosque Congelado',     monster:{name:'Espina Helada',         emoji:'🥶', boss:false}},
+  {n:4,  zone:'ice',    title:'Cueva de Cristal',     monster:{name:'Cristal Roto',          emoji:'💎', boss:false}},
+  {n:5,  zone:'ice',    title:'Torre de Hielo',       monster:{name:'Centinela de Hielo',    emoji:'🧊', boss:true}},
+  {n:6,  zone:'shadow', title:'Portal Crepuscular',   monster:{name:'Sombra Susurrante',     emoji:'👤', boss:false}},
+  {n:7,  zone:'shadow', title:'Valle de Sombras',     monster:{name:'Murciélago Caótico',    emoji:'🦇', boss:false}},
+  {n:8,  zone:'shadow', title:'Templo Oculto',        monster:{name:'Fantasma Numérico',     emoji:'👻', boss:false}},
+  {n:9,  zone:'shadow', title:'Abismo Estelar',       monster:{name:'Serpiente de Niebla',   emoji:'🐍', boss:false}},
+  {n:10, zone:'shadow', title:'Trono Final',          monster:{name:'Caos, el Mago de la Confusión', emoji:'🧙‍♂️', boss:true}},
+];
+
+const ZONE_STYLE = {
+  ice:    { bg:'linear-gradient(135deg, var(--ice-accent), var(--ice-deep))', tagBg:'var(--ice-accent)' },
+  shadow: { bg:'linear-gradient(135deg, var(--shadow-3), var(--shadow-2))',   tagBg:'var(--shadow-2)' }
+};
+
+let LEVELS = LEVELS_TEMPLATE.map((l,i)=>({ ...l, status: i===0 ? 'unlocked':'locked', stars:0 }));
+let companionKey = null;
+
+let currentLevelIndex = null;
+let queue = [];
+let currentFact = null;
+let perfectCount = 0;
+let totalFacts = 10;
+let awaitingNext = false;
+
+/* ============ ALMACENAMIENTO ============ */
+async function storageGet(key){
+  try{
+    const r = await window.storage.get(key, false);
+    return r ? JSON.parse(r.value) : null;
+  }catch(e){ return null; }
+}
+async function storageSet(key, value){
+  try{
+    await window.storage.set(key, JSON.stringify(value), false);
+    return true;
+  }catch(e){ console.error('No se pudo guardar el progreso', e); return false; }
+}
+async function storageDelete(key){
+  try{ await window.storage.delete(key, false); }catch(e){ /* puede no existir */ }
+}
+
+async function saveProgress(){
+  await storageSet(PROGRESS_KEY, {
+    levels: LEVELS.map(l=>({n:l.n, status:l.status, stars:l.stars})),
+    updatedAt: Date.now()
+  });
+}
+async function saveCompanion(key){
+  await storageSet(COMPANION_KEY, { companion:key });
+}
+
+function applyProgress(savedLevels){
+  savedLevels.forEach(sl=>{
+    const lvl = LEVELS.find(l=>l.n===sl.n);
+    if(lvl){ lvl.status = sl.status; lvl.stars = sl.stars; }
+  });
+}
+
+/* ============ INICIO ============ */
+async function init(){
+  const comp = await storageGet(COMPANION_KEY);
+  const prog = await storageGet(PROGRESS_KEY);
+
+  document.getElementById('loading-screen').classList.remove('active');
+
+  if(comp && comp.companion){
+    companionKey = comp.companion;
+    if(prog && Array.isArray(prog.levels)){
+      applyProgress(prog.levels);
+    }
+    updatePlayerBadges();
+    document.getElementById('main-subtitle').textContent =
+      `¡Bienvenida de nuevo, Samantha! ${COMPANIONS[companionKey].name} continúa la aventura contigo.`;
+    renderMap();
+  } else {
+    document.getElementById('companion-screen').classList.add('active');
+  }
+}
+
+function updatePlayerBadges(){
+  document.getElementById('settings-companion').textContent =
+    companionKey ? `${COMPANIONS[companionKey].emoji} ${COMPANIONS[companionKey].name}` : '—';
+}
+
+async function chooseCompanion(key){
+  companionKey = key;
+  await saveCompanion(key);
+  document.getElementById('companion-screen').classList.remove('active');
+  document.getElementById('story-companion-line').textContent =
+    `${COMPANIONS[key].name} te ha elegido como su ayudante, Samantha. Juntas recorrerán 10 misiones, una por cada tabla, sellando a las criaturas confundidas y devolviéndole la memoria al Reino.`;
+  document.getElementById('story-screen').classList.add('active');
+}
+
+function beginMap(){
+  document.getElementById('story-screen').classList.remove('active');
+  document.getElementById('main-subtitle').textContent =
+    `Samantha y ${COMPANIONS[companionKey].name} se embarcan en una aventura para derrotar a Caos.`;
+  updatePlayerBadges();
+  renderMap();
+  saveProgress();
+}
+
+/* ============ MAPA ============ */
+const nodeXPattern = [22, 68, 30, 78, 18, 66, 28, 80, 24, 50];
+const topPad = 55, gap = 122, bottomPad = 60;
+
+function renderMap(){
+  const map = document.getElementById('path-map');
+  const h = topPad + gap*(LEVELS.length-1) + bottomPad;
+  map.style.height = h + 'px';
+
+  const points = LEVELS.map((lvl,i)=>({ x: nodeXPattern[i], y: topPad + gap*i }));
+
+  let svg = `<svg id="path-svg" viewBox="0 0 100 ${h}" preserveAspectRatio="none">`;
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for(let i=1;i<points.length;i++){
+    const p0=points[i-1], p1=points[i];
+    const midY=(p0.y+p1.y)/2;
+    d += ` C ${p0.x} ${midY}, ${p1.x} ${midY}, ${p1.x} ${p1.y}`;
+  }
+  svg += `<path d="${d}" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="0.1 3.2" stroke-linecap="round" opacity="0.85" vector-effect="non-scaling-stroke"/>`;
+  svg += `</svg>`;
+
+  let html = svg;
+  LEVELS.forEach((lvl,i)=>{
+    const style = ZONE_STYLE[lvl.zone];
+    const isLocked = lvl.status==='locked';
+    const isCurrent = lvl.status==='unlocked';
+    const starsHtml = [1,2,3].map(s=>`<span class="${s<=lvl.stars?'':'star-empty'}">⭐</span>`).join('');
+    html += `
+      <div class="level-node ${isLocked?'locked':''} ${lvl.monster.boss?'boss':''}" style="left:${points[i].x}%; top:${points[i].y}px;" onclick="${isLocked? '' : `openMissionIntro(${i})`}">
+        <div class="node-circle ${isCurrent?'current':''}" style="background:${isLocked?'':style.bg}">
+          ${isLocked ? '<span class="lock">🔒</span>' : (lvl.status==='completed' ? '⭐' : lvl.n)}
+        </div>
+        <div class="node-label">Misión ${lvl.n}${lvl.monster.boss? ' 👑':''}<br>Tabla del ${lvl.n}</div>
+        ${!isLocked ? `<div class="node-monster">${lvl.monster.emoji} ${lvl.monster.name}</div>` : ''}
+        ${lvl.stars>0 ? `<div class="node-stars">${starsHtml}</div>` : ''}
+      </div>`;
+  });
+
+  map.innerHTML = html;
+  document.getElementById('star-count').textContent = LEVELS.reduce((a,l)=>a+l.stars,0);
+  document.getElementById('badge-count').textContent = LEVELS.filter(l=>l.status==='completed').length;
+}
+
+/* ============ MISIÓN: INTRO ============ */
+function openMissionIntro(i){
+  currentLevelIndex = i;
+  const lvl = LEVELS[i];
+  const style = ZONE_STYLE[lvl.zone];
+  const comp = COMPANIONS[companionKey];
+
+  document.getElementById('mission-tag').textContent = lvl.monster.boss ? `Misión ${lvl.n} · Jefe` : `Misión ${lvl.n}`;
+  document.getElementById('mission-tag').style.background = lvl.monster.boss ? 'var(--shadow-2)' : style.tagBg;
+  document.getElementById('mission-title').textContent = lvl.title;
+  document.getElementById('monster-emoji').textContent = lvl.monster.emoji;
+  document.getElementById('monster-name').textContent = lvl.monster.name;
+  document.getElementById('monster-sub').textContent = lvl.monster.boss ? '¡Es un jefe! Necesitarás dominar toda la tabla.' : 'Bloquea el camino';
+
+  let narrative;
+  if(lvl.n === 10){
+    narrative = `Samantha, has llegado al Trono Final junto a ${comp.name}. Aquí espera Caos, el Mago de la Confusión. Solo si dominas la tabla del 10 podrás romper su hechizo y devolverle la memoria a todo el Reino.`;
+  } else if(lvl.monster.boss){
+    narrative = `${comp.name} te advierte: "¡Cuidado, Samantha! ${lvl.monster.name} es el guardián de esta zona. Si dominas la tabla del ${lvl.n}, lo sellaremos juntas y el camino se abrirá."`;
+  } else {
+    narrative = `En ${lvl.title}, un ${lvl.monster.name} ha atrapado los números y los confundió. ${comp.name} te dice: "Si dominas la tabla del ${lvl.n}, podremos sellarlo y seguir avanzando."`;
+  }
+  document.getElementById('mission-narrative').textContent = narrative;
+  document.getElementById('mission-tip').textContent = TIPS[lvl.n];
+
+  document.getElementById('mission-screen').classList.add('active');
+}
+function closeMissionIntro(){
+  document.getElementById('mission-screen').classList.remove('active');
+}
+
+/* ============ NIVEL / QUIZ ============ */
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function buildQueue(table){
+  const facts = [];
+  for(let b=1;b<=10;b++){ facts.push({a:table, b, answer:table*b, attempts:0}); }
+  return shuffle(facts);
+}
+
+function startMission(){
+  document.getElementById('mission-screen').classList.remove('active');
+  const lvl = LEVELS[currentLevelIndex];
+  const style = ZONE_STYLE[lvl.zone];
+  const comp = COMPANIONS[companionKey];
+
+  document.getElementById('level-tag').textContent = `Tabla del ${lvl.n} · ${lvl.title}`;
+  document.getElementById('level-tag').style.background = style.tagBg;
+  document.getElementById('char-avatar').textContent = comp.emoji;
+  document.getElementById('char-avatar').style.background = comp.bg;
+  document.getElementById('inline-tip').classList.remove('show');
+  document.getElementById('inline-tip').textContent = `💡 ${TIPS[lvl.n]}`;
+
+  queue = buildQueue(lvl.n);
+  totalFacts = queue.length;
+  perfectCount = 0;
+  awaitingNext = false;
+
+  renderProgress();
+  setSpeech(lvl.zone);
+  document.getElementById('level-view').classList.add('active');
+  nextQuestion();
+}
+function toggleTip(){
+  document.getElementById('inline-tip').classList.toggle('show');
+}
+function closeLevel(){
+  document.getElementById('level-view').classList.remove('active');
+  renderMap();
+}
+function setSpeech(zone){
+  const pool = zone==='ice' ? ICE_MSGS : SHADOW_MSGS;
+  document.getElementById('char-speech').textContent = pool[Math.floor(Math.random()*pool.length)];
+}
+function renderProgress(){
+  const track = document.getElementById('progress-track');
+  let html = '';
+  for(let i=0;i<totalFacts;i++){ html += `<div class="progress-dot" id="dot-${i}"></div>`; }
+  track.innerHTML = html;
+}
+function generateOptions(a,b){
+  const correct = a*b;
+  const opts = new Set([correct]);
+  const deltas = shuffle([a,-a,b,-b,a+b,-(a+b),2,-2,-a*2,b*2]);
+  for(const d of deltas){
+    if(opts.size>=4) break;
+    const val = correct+d;
+    if(val>0 && val!==correct && !opts.has(val)) opts.add(val);
+  }
+  while(opts.size<4){
+    const val = correct + (Math.floor(Math.random()*9)-4);
+    if(val>0 && !opts.has(val)) opts.add(val);
+  }
+  return shuffle([...opts]);
+}
+
+function nextQuestion(){
+  awaitingNext = false;
+  document.getElementById('feedback-panel').classList.remove('show');
+  document.getElementById('answer-line').style.display = 'none';
+
+  if(queue.length===0){ finishLevel(); return; }
+
+  currentFact = queue.shift();
+  document.getElementById('question-op').textContent = `${currentFact.a} × ${currentFact.b} = ?`;
+
+  const options = generateOptions(currentFact.a, currentFact.b);
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = ()=>handleAnswer(opt, btn);
+    grid.appendChild(btn);
+  });
+
+  if(Math.random()<0.3){ setSpeech(LEVELS[currentLevelIndex].zone); }
+}
+
+function handleAnswer(selected, btn){
+  if(awaitingNext) return;
+  awaitingNext = true;
+  const grid = document.getElementById('options-grid');
+  const buttons = [...grid.children];
+  const correct = currentFact.answer;
+
+  buttons.forEach(b=>{
+    b.disabled = true;
+    if(parseInt(b.textContent)===correct) b.classList.add('correct');
+  });
+
+  const panel = document.getElementById('feedback-panel');
+  const title = document.getElementById('feedback-title');
+  const text = document.getElementById('feedback-text');
+  const dotGrid = document.getElementById('dot-grid');
+  const addLine = document.getElementById('addition-line');
+  const ansLine = document.getElementById('answer-line');
+  const nextBtn = document.getElementById('next-btn');
+
+  if(selected===correct){
+    panel.className = 'feedback-panel show good';
+    title.textContent = currentFact.attempts===0 ? '¡Perfecto, a la primera! 🎉' : '¡Muy bien, ahora sí quedó clara! 🎉';
+    text.textContent = `${currentFact.a} × ${currentFact.b} = ${correct}. ¡Ya sellaste un pedacito de la criatura confundida!`;
+    dotGrid.innerHTML = '';
+    addLine.textContent = '';
+    ansLine.style.display = 'none';
+    nextBtn.className = 'next-btn good';
+    nextBtn.textContent = 'Siguiente';
+    if(currentFact.attempts===0) perfectCount++;
+    markDotDone();
+  } else {
+    btn.classList.add('wrong');
+    currentFact.attempts++;
+    panel.className = 'feedback-panel show oops';
+    title.textContent = '¡No pasa nada! Equivocarse es parte de aprender 💛';
+    text.textContent = `Imagina que tienes ${currentFact.a} bolsitas con ${currentFact.b} caramelos en cada una. ¡Vamos a contarlos juntas!`;
+
+    let dotsHtml = '';
+    for(let r=0;r<currentFact.a;r++){
+      dotsHtml += '<div class="dot-row">' + '<span class="dot">🍬</span>'.repeat(currentFact.b) + '</div>';
+    }
+    dotGrid.innerHTML = dotsHtml;
+    addLine.textContent = `${Array(currentFact.a).fill(currentFact.b).join(' + ')} = ${correct}`;
+    ansLine.textContent = `Entonces: ${currentFact.a} × ${currentFact.b} = ${correct}`;
+    ansLine.style.display = 'block';
+
+    nextBtn.className = 'next-btn oops';
+    nextBtn.textContent = 'Vale, ¡inténtalo otra vez!';
+
+    const insertAt = Math.min(queue.length, 3);
+    queue.splice(insertAt, 0, currentFact);
+    markDotRetry();
+  }
+
+  panel.classList.add('show');
+}
+
+function markDotDone(){
+  const dots = [...document.querySelectorAll('.progress-dot')];
+  const target = dots.find(d=>!d.classList.contains('done'));
+  if(target){ target.classList.remove('retry'); target.classList.add('done'); }
+}
+function markDotRetry(){
+  const dots = [...document.querySelectorAll('.progress-dot')];
+  const target = dots.find(d=>!d.classList.contains('done') && !d.classList.contains('retry'));
+  if(target) target.classList.add('retry');
+}
+
+async function finishLevel(){
+  const lvl = LEVELS[currentLevelIndex];
+  let stars = 1;
+  if(perfectCount>=9) stars = 3;
+  else if(perfectCount>=6) stars = 2;
+
+  lvl.stars = Math.max(lvl.stars, stars);
+  lvl.status = 'completed';
+  if(currentLevelIndex+1 < LEVELS.length && LEVELS[currentLevelIndex+1].status==='locked'){
+    LEVELS[currentLevelIndex+1].status = 'unlocked';
+  }
+  await saveProgress();
+
+  document.getElementById('level-view').classList.remove('active');
+  showReward(lvl, stars);
+}
+
+function showReward(lvl, stars){
+  const comp = COMPANIONS[companionKey];
+  const isBoss = lvl.monster.boss;
+  const isFinal = lvl.n === 10;
+
+  document.getElementById('reward-badge').style.background = isFinal ? 'linear-gradient(135deg, var(--gold), var(--gold-dark))' : (isBoss ? 'linear-gradient(135deg, var(--shadow-3), var(--shadow-2))' : ZONE_STYLE[lvl.zone].bg);
+  document.getElementById('reward-badge').textContent = isFinal ? '👑' : (stars===3 ? '🏆' : '🏅');
+  document.getElementById('reward-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+  document.getElementById('reward-title').textContent = isFinal ? '¡Caos ha sido derrotado!' : `¡Tabla del ${lvl.n} dominada!`;
+
+  let msg;
+  if(isFinal){
+    msg = `¡Lo lograste, Samantha! Junto a ${comp.name}, sellaste a Caos y todos los números del Reino recuperaron su memoria. ¡Eres una verdadera maestra de las tablas de multiplicar!`;
+  } else if(lvl.n===5){
+    const other = companionKey==='ice' ? COMPANIONS.shadow : COMPANIONS.ice;
+    msg = `¡Has vencido al Centinela de Hielo! El Reino de Hielo está a salvo. Ahora ${other.name} se une a la aventura para cruzar juntas al Reino de Sombras.`;
+  } else {
+    const nextLvl = LEVELS[currentLevelIndex+1];
+    msg = `¡Has sellado a ${lvl.monster.emoji} ${lvl.monster.name}! ${comp.name} está muy orgullosa de ti, Samantha. El camino hacia ${nextLvl ? nextLvl.title : 'la siguiente zona'} se abre.`;
+  }
+  document.getElementById('reward-text').textContent = msg;
+
+  const view = document.getElementById('reward-view');
+  view.classList.add('active');
+  launchConfetti(isFinal);
+  renderMap();
+}
+
+function launchConfetti(big){
+  const container = document.getElementById('reward-sheet-inner');
+  const emojis = big ? ['⭐','👑','✨','🎉','💛'] : ['⭐','❄️','✨','🎉'];
+  const count = big ? 30 : 18;
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left = Math.random()*100 + '%';
+    el.style.animationDuration = (1.2 + Math.random()*1.2) + 's';
+    el.style.animationDelay = (Math.random()*0.4) + 's';
+    container.appendChild(el);
+    setTimeout(()=>el.remove(), 3000);
+  }
+}
+
+function replayLevel(){
+  document.getElementById('reward-view').classList.remove('active');
+  openMissionIntro(currentLevelIndex);
+}
+function backToMap(){
+  document.getElementById('reward-view').classList.remove('active');
+  renderMap();
+}
+
+/* ============ AJUSTES ============ */
+function openSettings(){
+  updatePlayerBadges();
+  document.getElementById('settings-screen').classList.add('active');
+}
+function closeSettings(){
+  document.getElementById('settings-screen').classList.remove('active');
+}
+function startChangeCompanion(){
+  closeSettings();
+  document.getElementById('companion-screen').classList.add('active');
+}
+function askResetConfirm(){
+  closeSettings();
+  document.getElementById('confirm-screen').classList.add('active');
+}
+function closeConfirm(){
+  document.getElementById('confirm-screen').classList.remove('active');
+}
+async function doReset(){
+  LEVELS = LEVELS_TEMPLATE.map((l,i)=>({ ...l, status: i===0 ? 'unlocked':'locked', stars:0 }));
+  await saveProgress();
+  document.getElementById('confirm-screen').classList.remove('active');
+  renderMap();
+}
+
+/* ============ ARRANQUE ============ */
+init();
+</script>
+</body>
+</html>
