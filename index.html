@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Camino de las Tablas Mágicas — Samantha</title>
+<title>El Camino de las Tablas Mágicas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -43,24 +43,21 @@
 
   /* ---------- TOPBAR ---------- */
   .topbar{
-    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    display:flex; align-items:center; justify-content:space-between; gap:6px;
     background:rgba(255,255,255,0.8); backdrop-filter: blur(6px);
-    border-radius:999px; padding:8px 10px 8px 16px;
+    border-radius:999px; padding:8px 8px 8px 16px;
     box-shadow:0 4px 16px rgba(40,30,80,0.15);
     position:sticky; top:10px; z-index:30;
   }
-  .brand{ font-family:'Baloo 2', cursive; font-weight:800; font-size:1.05rem; color:var(--ice-deep); line-height:1.15; }
-  .brand span{ display:block; font-size:0.68rem; font-weight:700; color:#6a5fa0; font-family:'Nunito',sans-serif; }
-  .stats{ display:flex; align-items:center; gap:8px; }
-  .pill{ display:flex; align-items:center; gap:5px; background:#fff; border-radius:999px; padding:6px 11px; font-weight:800; font-size:0.92rem; box-shadow:inset 0 0 0 2px rgba(0,0,0,0.04); }
+  .brand{ font-family:'Baloo 2', cursive; font-weight:800; font-size:1.02rem; color:var(--ice-deep); line-height:1.15; }
+  .brand span{ display:block; font-size:0.66rem; font-weight:700; color:#6a5fa0; font-family:'Nunito',sans-serif; }
+  .stats{ display:flex; align-items:center; gap:6px; }
+  .pill{ display:flex; align-items:center; gap:5px; background:#fff; border-radius:999px; padding:6px 10px; font-weight:800; font-size:0.88rem; box-shadow:inset 0 0 0 2px rgba(0,0,0,0.04); border:none; cursor:default; }
   .pill.stars{color:var(--gold-dark);}
-  .pill.badges{color:var(--shadow-2);}
-  .gear-btn{
-    width:38px;height:38px; border-radius:50%; border:none; background:#f1eef8;
-    font-size:1.15rem; cursor:pointer; flex-shrink:0;
-  }
+  .pill.puzzle{color:var(--shadow-2); cursor:pointer;}
+  .icon-btn{ width:36px;height:36px; border-radius:50%; border:none; background:#f1eef8; font-size:1.05rem; cursor:pointer; flex-shrink:0; }
 
-  h1.title{ text-align:center; font-size:1.7rem; margin:24px 0 4px; color:var(--ice-deep); text-shadow:0 2px 0 rgba(255,255,255,0.6); }
+  h1.title{ text-align:center; font-size:1.65rem; margin:24px 0 4px; color:var(--ice-deep); text-shadow:0 2px 0 rgba(255,255,255,0.6); }
   p.subtitle{ text-align:center; margin:0 0 22px; color:#443b73; font-weight:800; font-size:1.02rem; line-height:1.5; }
 
   /* ---------- MAP ---------- */
@@ -80,12 +77,12 @@
   .node-circle .lock{ font-size:1.5rem; }
   .node-circle.current{ animation: pulse 1.8s ease-in-out infinite; }
   @keyframes pulse{ 0%,100%{ box-shadow:0 6px 14px rgba(30,20,60,0.28), 0 0 0 0 rgba(255,183,3,0.6);} 50%{ box-shadow:0 6px 14px rgba(30,20,60,0.28), 0 0 0 12px rgba(255,183,3,0);} }
-  .node-label{ font-weight:800; font-size:0.82rem; color:#3a3260; background:rgba(255,255,255,0.9); padding:3px 9px; border-radius:999px; white-space:nowrap; text-align:center; }
-  .node-monster{ font-size:0.72rem; font-weight:700; color:#5a4f8a; }
-  .node-stars{ display:flex; gap:1px; font-size:0.82rem; filter:drop-shadow(0 1px 1px rgba(0,0,0,0.2)); }
+  .node-label{ font-weight:800; font-size:0.8rem; color:#3a3260; background:rgba(255,255,255,0.9); padding:3px 9px; border-radius:999px; white-space:nowrap; text-align:center; }
+  .node-monster{ font-size:0.7rem; font-weight:700; color:#5a4f8a; }
+  .node-stars{ display:flex; gap:1px; font-size:0.8rem; filter:drop-shadow(0 1px 1px rgba(0,0,0,0.2)); }
   .node-stars .star-empty{ opacity:0.35; }
 
-  /* ---------- OVERLAYS (genéricas) ---------- */
+  /* ---------- OVERLAYS ---------- */
   .overlay{ display:none; position:fixed; inset:0; z-index:60; background:linear-gradient(180deg, rgba(20,10,40,0.55), rgba(20,10,40,0.8)); align-items:center; justify-content:center; padding:16px; }
   .overlay.active{ display:flex; }
   .overlay.bottom{ align-items:flex-end; }
@@ -101,37 +98,30 @@
   .center-text{ text-align:center; }
   .big-emoji{ font-size:3.6rem; margin-bottom:6px; }
 
-  /* Loading */
   #loading-screen .card{ text-align:center; }
-  .spinner{
-    width:52px; height:52px; border-radius:50%;
-    border:6px solid #e7e3f4; border-top-color:var(--shadow-2);
-    margin:0 auto 16px; animation: spin 0.9s linear infinite;
-  }
+  .spinner{ width:52px; height:52px; border-radius:50%; border:6px solid #e7e3f4; border-top-color:var(--shadow-2); margin:0 auto 16px; animation: spin 0.9s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg);} }
+
+  /* Name entry */
+  .name-input{
+    width:100%; padding:16px 18px; margin-top:16px; border-radius:16px; border:3px solid #e7e3f4;
+    font-family:'Baloo 2', cursive; font-size:1.3rem; font-weight:700; color:var(--ink); text-align:center;
+  }
+  .name-input:focus{ outline:none; border-color:var(--ice-accent); }
+  .name-error{ color:var(--oops-dark); font-weight:800; font-size:0.9rem; margin-top:8px; display:none; }
+  .name-error.show{ display:block; }
 
   /* Companion choice */
   .companion-grid{ display:flex; gap:14px; margin-top:18px; }
-  .companion-card{
-    flex:1; border:4px solid #e7e3f4; border-radius:22px; padding:18px 10px; text-align:center;
-    cursor:pointer; background:#fbfaff; transition:all .15s ease;
-  }
+  .companion-card{ flex:1; border:4px solid #e7e3f4; border-radius:22px; padding:18px 10px; text-align:center; cursor:pointer; background:#fbfaff; transition:all .15s ease; }
   .companion-card:active{ transform:scale(0.96); }
-  .companion-card .avatar-lg{
-    width:76px; height:76px; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;
-    font-size:2.1rem; border:4px solid #fff; box-shadow:0 6px 14px rgba(0,0,0,0.2);
-  }
+  .companion-card .avatar-lg{ width:76px; height:76px; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:2.1rem; border:4px solid #fff; box-shadow:0 6px 14px rgba(0,0,0,0.2); }
   .companion-card h3{ margin:0 0 4px; font-size:1.15rem; }
   .companion-card p{ margin:0; font-size:0.85rem; color:#5a4f8a; font-weight:700; line-height:1.4; }
 
-  /* Story */
   .story-text{ font-size:1.08rem; font-weight:700; color:#443b73; line-height:1.6; margin-bottom:10px; }
 
-  .big-btn{
-    display:block; width:100%; margin-top:18px; padding:16px; border:none; border-radius:18px;
-    font-family:'Baloo 2', cursive; font-weight:800; font-size:1.15rem; color:#fff; cursor:pointer;
-    background:var(--gold-dark); box-shadow:0 6px 0 #a86800;
-  }
+  .big-btn{ display:block; width:100%; margin-top:18px; padding:16px; border:none; border-radius:18px; font-family:'Baloo 2', cursive; font-weight:800; font-size:1.15rem; color:#fff; cursor:pointer; background:var(--gold-dark); box-shadow:0 6px 0 #a86800; }
   .big-btn:active{ transform:translateY(3px); box-shadow:0 3px 0 #a86800; }
   .big-btn.purple{ background:var(--shadow-2); box-shadow:0 6px 0 #4a1f80; }
   .big-btn.purple:active{ box-shadow:0 3px 0 #4a1f80; }
@@ -143,17 +133,12 @@
   /* Mission intro */
   .mission-tag{ display:inline-block; font-weight:800; font-size:0.85rem; padding:6px 14px; border-radius:999px; color:#fff; margin-bottom:10px; }
   .mission-title{ font-size:1.5rem; margin:0 0 12px; color:var(--ice-deep); }
-  .monster-banner{
-    display:flex; align-items:center; gap:14px; background:#f4f1fc; border-radius:18px; padding:14px 16px; margin-bottom:14px;
-  }
+  .monster-banner{ display:flex; align-items:center; gap:14px; background:#f4f1fc; border-radius:18px; padding:14px 16px; margin-bottom:14px; }
   .monster-emoji{ font-size:2.6rem; }
   .monster-name{ font-weight:800; font-size:1.05rem; color:#3a3260; }
   .monster-sub{ font-weight:700; font-size:0.85rem; color:#6a5fa0; }
   .mission-narrative{ font-size:1.05rem; font-weight:700; color:#443b73; line-height:1.55; margin-bottom:16px; }
-  .tip-box{
-    background:linear-gradient(135deg, #fff6df, #ffe9b8); border-radius:18px; padding:14px 16px; margin-bottom:6px;
-    border:2px dashed var(--gold-dark);
-  }
+  .tip-box{ background:linear-gradient(135deg, #fff6df, #ffe9b8); border-radius:18px; padding:14px 16px; margin-bottom:6px; border:2px dashed var(--gold-dark); }
   .tip-box h4{ margin:0 0 6px; font-size:1rem; color:#8a5a00; display:flex; align-items:center; gap:6px; }
   .tip-box p{ margin:0; font-weight:700; font-size:0.98rem; color:#6b4a00; line-height:1.5; }
 
@@ -205,21 +190,36 @@
   .next-btn.oops{ background:var(--oops-dark); }
 
   /* Reward */
-  .reward-badge{ width:130px;height:130px; border-radius:50%; margin:6px auto 14px; display:flex;align-items:center;justify-content:center; font-size:3.4rem; border:6px solid #fff; box-shadow:0 8px 20px rgba(0,0,0,0.25); }
-  .reward-stars{ font-size:2.3rem; margin-bottom:8px; letter-spacing:5px; }
-  .reward-title{ font-size:1.55rem; margin:0 0 10px; color:var(--ice-deep); }
-  .reward-text{ font-weight:700; color:#4c4370; margin-bottom:22px; font-size:1.02rem; line-height:1.55; }
-  .reward-actions{ display:flex; gap:10px; }
-  .reward-actions button{ flex:1; padding:15px; border-radius:16px; border:none; font-family:'Baloo 2', cursive; font-weight:800; font-size:1rem; cursor:pointer; }
+  .reward-badge{ width:110px;height:110px; border-radius:50%; margin:6px auto 10px; display:flex;align-items:center;justify-content:center; font-size:3rem; border:6px solid #fff; box-shadow:0 8px 20px rgba(0,0,0,0.25); }
+  .reward-stars{ font-size:2.1rem; margin-bottom:6px; letter-spacing:5px; }
+  .reward-title{ font-size:1.45rem; margin:0 0 8px; color:var(--ice-deep); }
+  .reward-text{ font-weight:700; color:#4c4370; margin-bottom:14px; font-size:1rem; line-height:1.55; }
+  .reward-piece-box{ background:#f4f1fc; border-radius:18px; padding:14px; margin-bottom:16px; }
+  .reward-piece-box .piece-caption{ font-weight:800; font-size:0.95rem; color:#5a4f8a; margin-top:8px; }
+  .reward-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .reward-actions button{ flex:1; min-width:120px; padding:15px; border-radius:16px; border:none; font-family:'Baloo 2', cursive; font-weight:800; font-size:0.95rem; cursor:pointer; }
   .btn-secondary{ background:#f1eef8; color:#6a5fa0; }
   .btn-primary{ background:var(--gold); color:#5a3d00; }
+  .btn-puzzle{ background:var(--shadow-2); color:#fff; }
 
   .confetti{ position:absolute; top:-10px; font-size:1.3rem; animation: fall linear forwards; }
   @keyframes fall{ to{ transform:translateY(440px) rotate(360deg); opacity:0; } }
 
+  /* Puzzle */
+  .puzzle-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:4px; max-width:420px; margin:14px auto; border-radius:16px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.18); border:4px solid #fff; }
+  .puzzle-tile{ aspect-ratio:1/1; position:relative; background:#e7e3f4; }
+  .puzzle-tile.locked{ display:flex; align-items:center; justify-content:center; font-weight:800; color:#8a80b8; font-size:1rem; background:repeating-linear-gradient(45deg,#e7e3f4,#e7e3f4 6px,#ddd7f0 6px,#ddd7f0 12px); }
+  .puzzle-tile.revealed{ background-repeat:no-repeat; }
+  .reward-piece{ width:100px;height:100px; border-radius:14px; margin:0 auto; box-shadow:0 4px 10px rgba(0,0,0,0.18); border:3px solid #fff; }
+
   /* Settings */
   .settings-row{ display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:2px solid #f1eef8; font-weight:800; font-size:1rem; color:#3a3260; }
   .settings-row:last-of-type{ border-bottom:none; }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:12px 0; }
+  .toggle-btn{ width:56px; height:32px; border-radius:999px; background:#e7e3f4; border:none; position:relative; cursor:pointer; }
+  .toggle-btn.on{ background:var(--success); }
+  .toggle-knob{ position:absolute; top:3px; left:3px; width:26px; height:26px; border-radius:50%; background:#fff; transition:left .15s ease; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+  .toggle-btn.on .toggle-knob{ left:27px; }
 
   footer.note{ text-align:center; font-size:0.8rem; color:#5a4f8a; margin-top:32px; opacity:0.9; font-weight:700; line-height:1.6; }
 
@@ -233,16 +233,17 @@
 
 <div id="app">
   <div class="topbar">
-    <div class="brand">Camino de las Tablas<span id="player-tagline">La aventura de Samantha</span></div>
+    <div class="brand">Camino de las Tablas<span id="player-tagline">Mapa mágico de multiplicación</span></div>
     <div class="stats">
       <div class="pill stars">⭐ <span id="star-count">0</span></div>
-      <div class="pill badges">🏅 <span id="badge-count">0</span>/10</div>
-      <button class="gear-btn" onclick="openSettings()">⚙️</button>
+      <button class="pill puzzle" onclick="openPuzzle()">🧩 <span id="piece-count">0</span>/10</button>
+      <button class="icon-btn" id="mute-btn" onclick="toggleSound()">🔊</button>
+      <button class="icon-btn" onclick="openSettings()">⚙️</button>
     </div>
   </div>
 
   <h1 class="title">✨ El Camino de las Tablas Mágicas ✨</h1>
-  <p class="subtitle" id="main-subtitle">Samantha se embarca en una aventura para derrotar a Caos.</p>
+  <p class="subtitle" id="main-subtitle">Elige tu nombre para comenzar la aventura.</p>
 
   <div id="path-map"></div>
 
@@ -253,7 +254,19 @@
 <div class="overlay active" id="loading-screen">
   <div class="card center-text">
     <div class="spinner"></div>
-    <p class="story-text">Cargando tu aventura, Samantha...</p>
+    <p class="story-text">Cargando tu aventura...</p>
+  </div>
+</div>
+
+<!-- NAME ENTRY -->
+<div class="overlay" id="name-screen">
+  <div class="card center-text">
+    <div class="big-emoji">🌟</div>
+    <h2 class="mission-title">¿Cómo te llamas?</h2>
+    <p class="story-text">Escribe tu nombre para comenzar (o continuar) tu aventura mágica.</p>
+    <input type="text" id="name-field" class="name-input" placeholder="Tu nombre" maxlength="20" autocomplete="off">
+    <p class="name-error" id="name-error">Escribe tu nombre para continuar 💛</p>
+    <button class="big-btn purple" onclick="submitName()">Continuar</button>
   </div>
 </div>
 
@@ -261,7 +274,7 @@
 <div class="overlay" id="companion-screen">
   <div class="card center-text">
     <div class="big-emoji">👋</div>
-    <h2 class="mission-title">¡Hola, Samantha!</h2>
+    <h2 class="mission-title" id="companion-greeting">¡Hola!</h2>
     <p class="story-text">Antes de empezar, elige a tu compañera de aventura. Ella te acompañará en cada misión.</p>
     <div class="companion-grid">
       <div class="companion-card" onclick="chooseCompanion('ice')">
@@ -284,8 +297,8 @@
     <div class="center-text big-emoji">🧙‍♂️💜</div>
     <h2 class="mission-title center-text">La leyenda de Caos</h2>
     <p class="story-text">Hace mucho tiempo, un hechicero llamado <strong>Caos</strong> le robó a los números su memoria. Desde entonces, los números olvidaron a sus compañeros de multiplicación y el Reino se llenó de criaturas confundidas que bloquean los caminos.</p>
-    <p class="story-text" id="story-companion-line">Nívea te ha elegido como su ayudante, Samantha. Juntas recorrerán 10 misiones, una por cada tabla, sellando a las criaturas confundidas y devolviéndole la memoria al Reino.</p>
-    <p class="story-text">Al final del camino, en el Trono Final, tendrán que enfrentar al mismísimo Caos. ¿Estás lista?</p>
+    <p class="story-text" id="story-companion-line">Tu compañera te ha elegido como su ayudante. Juntas recorrerán 10 misiones, una por cada tabla, sellando a las criaturas confundidas.</p>
+    <p class="story-text">Cada misión que completes te dará una <strong>pieza de un rompecabezas mágico</strong>. ¡Al final, cuando derrotes a Caos, se completará la imagen del Reino a salvo!</p>
     <button class="big-btn purple" onclick="beginMap()">¡Comenzar la aventura!</button>
   </div>
 </div>
@@ -329,7 +342,7 @@
 
     <div class="character-row">
       <div class="avatar" id="char-avatar">❄️</div>
-      <div class="speech" id="char-speech">¡Vamos a practicar juntas, Samantha!</div>
+      <div class="speech" id="char-speech">¡Vamos a practicar juntas!</div>
     </div>
 
     <div class="progress-track" id="progress-track"></div>
@@ -358,10 +371,25 @@
     <div class="reward-stars" id="reward-stars">⭐⭐⭐</div>
     <h2 class="reward-title" id="reward-title">¡Tabla del 1 dominada!</h2>
     <p class="reward-text" id="reward-text">Has abierto la siguiente misión.</p>
+    <div class="reward-piece-box">
+      <div class="reward-piece" id="reward-piece"></div>
+      <div class="piece-caption" id="reward-piece-caption">¡Nueva pieza del rompecabezas!</div>
+    </div>
     <div class="reward-actions">
       <button class="btn-secondary" onclick="replayLevel()">Practicar de nuevo</button>
+      <button class="btn-puzzle" onclick="openPuzzle()">Ver rompecabezas</button>
       <button class="btn-primary" onclick="backToMap()">Volver al camino</button>
     </div>
+  </div>
+</div>
+
+<!-- PUZZLE -->
+<div class="overlay" id="puzzle-screen">
+  <div class="card center-text">
+    <h2 class="mission-title">🧩 Rompecabezas del Reino</h2>
+    <p class="story-text" id="puzzle-progress-text">0 de 10 piezas encontradas</p>
+    <div id="puzzle-grid" class="puzzle-grid"></div>
+    <button class="big-btn ghost" onclick="closePuzzle()">Cerrar</button>
   </div>
 </div>
 
@@ -372,9 +400,14 @@
       <h2 class="mission-title" style="margin:0;">⚙️ Ajustes</h2>
       <button class="close-btn" onclick="closeSettings()">✕</button>
     </div>
-    <div class="settings-row"><span>Jugadora</span><span>Samantha</span></div>
+    <div class="settings-row"><span>Nombre</span><span id="settings-name">—</span></div>
     <div class="settings-row"><span>Compañera actual</span><span id="settings-companion">—</span></div>
+    <div class="toggle-row">
+      <span style="font-weight:800; font-size:1rem; color:#3a3260;">Sonido</span>
+      <button class="toggle-btn on" id="sound-toggle" onclick="toggleSound()"><span class="toggle-knob"></span></button>
+    </div>
     <button class="big-btn purple" onclick="startChangeCompanion()">Cambiar de compañera</button>
+    <button class="big-btn ghost" onclick="startSwitchPlayer()">Cambiar de jugador o jugadora</button>
     <button class="big-btn danger" onclick="askResetConfirm()">Reiniciar mi progreso</button>
   </div>
 </div>
@@ -384,17 +417,140 @@
   <div class="card center-text">
     <div class="big-emoji">🤔</div>
     <h2 class="mission-title">¿Reiniciar todo?</h2>
-    <p class="story-text">Vas a borrar todas tus estrellas y misiones completadas, Samantha. ¿Quieres empezar el camino desde cero?</p>
+    <p class="story-text" id="confirm-text">Vas a borrar todas tus estrellas, misiones y piezas del rompecabezas. ¿Quieres empezar el camino desde cero?</p>
     <button class="big-btn danger" onclick="doReset()">Sí, reiniciar</button>
     <button class="big-btn ghost" onclick="closeConfirm()">No, mejor no</button>
   </div>
 </div>
 
 <script>
-/* ============ CONFIGURACIÓN DE LA JUGADORA ============ */
-const PLAYER_NAME = "Samantha";
-const COMPANION_KEY = "samantha-companera";
-const PROGRESS_KEY = "samantha-progreso";
+/* ============ IMAGEN DEL ROMPECABEZAS (SVG original, dibujado a mano) ============ */
+const PUZZLE_COLS = 5, PUZZLE_ROWS = 2;
+const MASTER_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#bfe3ff"/>
+      <stop offset="100%" stop-color="#fbdce8"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="200" fill="url(#sky)"/>
+  <circle cx="55" cy="42" r="26" fill="#ffd166"/>
+  <g stroke-linecap="round" fill="none">
+    <path d="M 355 165 A 92 92 0 0 0 172 165" stroke="#ff8fa3" stroke-width="7"/>
+    <path d="M 355 165 A 78 78 0 0 0 186 165" stroke="#ffd166" stroke-width="7"/>
+    <path d="M 355 165 A 64 64 0 0 0 200 165" stroke="#8fd694" stroke-width="7"/>
+    <path d="M 355 165 A 50 50 0 0 0 214 165" stroke="#8fb8f0" stroke-width="7"/>
+  </g>
+  <rect y="172" width="500" height="28" fill="#bdeacb"/>
+  <polygon points="185,70 250,15 315,70" fill="#8fb8f0"/>
+  <rect x="205" y="70" width="90" height="100" fill="#eaf6ff" stroke="#8fb8f0" stroke-width="3"/>
+  <rect x="234" y="128" width="32" height="42" fill="#3d8bd4"/>
+  <rect x="192" y="55" width="18" height="30" fill="#eaf6ff" stroke="#8fb8f0" stroke-width="2"/>
+  <polygon points="186,55 201,32 216,55" fill="#7b2fbf"/>
+  <rect x="290" y="55" width="18" height="30" fill="#eaf6ff" stroke="#8fb8f0" stroke-width="2"/>
+  <polygon points="284,55 299,32 314,55" fill="#c4408a"/>
+  <rect x="220" y="95" width="20" height="20" fill="#bfe3ff"/>
+  <rect x="260" y="95" width="20" height="20" fill="#bfe3ff"/>
+  <circle cx="140" cy="162" r="15" fill="#ffe0c2"/>
+  <path d="M 125 162 a 15 15 0 0 1 30 0" fill="#3d8bd4"/>
+  <rect x="126" y="176" width="28" height="24" rx="7" fill="#8fb8f0"/>
+  <circle cx="140" cy="160" r="4" fill="#274b8a"/>
+  <text x="140" y="150" font-size="14" text-anchor="middle">❄️</text>
+  <circle cx="360" cy="162" r="15" fill="#ffe0c2"/>
+  <path d="M 345 162 a 15 15 0 0 1 30 0" fill="#7b2fbf"/>
+  <rect x="346" y="176" width="28" height="24" rx="7" fill="#c4408a"/>
+  <circle cx="360" cy="160" r="4" fill="#3a1a5c"/>
+  <text x="360" y="150" font-size="14" text-anchor="middle">🗡️</text>
+  <text x="250" y="28" font-size="19" text-anchor="middle" font-weight="800" fill="#274b8a" font-family="Baloo 2, Nunito, sans-serif">¡Reino de las Tablas a salvo!</text>
+</svg>`;
+const PUZZLE_IMG_URI = 'data:image/svg+xml;utf8,' + encodeURIComponent(MASTER_SVG);
+
+/* ============ SONIDO (sintetizado, sin archivos externos) ============ */
+let audioCtx = null;
+let soundOn = true;
+function getCtx(){
+  if(!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(AC) audioCtx = new AC();
+  }
+  return audioCtx;
+}
+function playTone(freq, duration, type, delay, gainVal){
+  if(!soundOn) return;
+  try{
+    const ctx = getCtx();
+    if(!ctx) return;
+    if(ctx.state === 'suspended') ctx.resume();
+    const t0 = ctx.currentTime + (delay||0);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, t0);
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(gainVal||0.15, t0+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0+duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0+duration+0.03);
+  }catch(e){ /* audio no disponible en este entorno */ }
+}
+function sndClick(){ playTone(440,0.07,'square',0,0.05); }
+function sndCorrect(){ playTone(523.25,0.12,'sine',0,0.14); playTone(659.25,0.14,'sine',0.09,0.14); playTone(783.99,0.18,'sine',0.18,0.14); }
+function sndWrong(){ playTone(233,0.16,'sine',0,0.1); playTone(207,0.22,'sine',0.1,0.09); }
+function sndLevelUp(){ [523.25,587.33,659.25,783.99,1046.5].forEach((f,i)=>playTone(f,0.2,'triangle',i*0.09,0.13)); }
+function sndVictory(){ [523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=>playTone(f,0.26,'triangle',i*0.11,0.15)); playTone(1046.5,0.45,'sine',0.65,0.11); }
+function sndOpen(){ playTone(660,0.09,'sine',0,0.08); playTone(880,0.1,'sine',0.06,0.07); }
+
+function toggleSound(){
+  soundOn = !soundOn;
+  document.getElementById('mute-btn').textContent = soundOn ? '🔊' : '🔇';
+  const t = document.getElementById('sound-toggle');
+  if(t) t.classList.toggle('on', soundOn);
+  if(soundOn) sndClick();
+  saveProfile();
+}
+
+/* ============ JUGADOR / ALMACENAMIENTO ============ */
+let playerName = '';
+let playerSlug = '';
+let companionKey = null;
+
+function slugify(name){
+  return name.trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'')
+    .slice(0,30) || 'jugador';
+}
+async function storageGet(key){
+  try{ const r = await window.storage.get(key, false); return r ? JSON.parse(r.value) : null; }
+  catch(e){ return null; }
+}
+async function storageSet(key, value){
+  try{ await window.storage.set(key, JSON.stringify(value), false); return true; }
+  catch(e){ console.error('No se pudo guardar', e); return false; }
+}
+
+async function saveProfile(){
+  await storageSet(`perfil-${playerSlug}`, {
+    name: playerName,
+    companion: companionKey,
+    levels: LEVELS.map(l=>({n:l.n, status:l.status, stars:l.stars})),
+    soundOn: soundOn,
+    updatedAt: Date.now()
+  });
+}
+async function setCurrentPlayer(){
+  await storageSet('current-player', { slug: playerSlug, name: playerName });
+}
+
+function applyProgress(savedLevels){
+  savedLevels.forEach(sl=>{
+    const lvl = LEVELS.find(l=>l.n===sl.n);
+    if(lvl){ lvl.status = sl.status; lvl.stars = sl.stars; }
+  });
+}
 
 /* ============ DATOS DEL JUEGO ============ */
 const COMPANIONS = {
@@ -402,18 +558,22 @@ const COMPANIONS = {
   shadow: { key:'shadow', name:'Luma',  emoji:'🗡️', bg:'linear-gradient(135deg, var(--shadow-3), var(--shadow-2))' }
 };
 
-const ICE_MSGS = [
-  "¡Los copos de nieve se forman en grupos iguales, igual que la multiplicación!",
-  "Respira hondo, Samantha. El hielo nunca tiene prisa, tú tampoco.",
-  "¡Cada acierto se convierte en un cristal para tu corona!",
-  "Confío en ti, exploradora del hielo."
-];
-const SHADOW_MSGS = [
-  "Las sombras solo se vencen con concentración, ¡como tú!",
-  "Cada acierto es una chispa de luz en la oscuridad.",
-  "¡Con cada tabla dominada, tu espada brilla más fuerte!",
-  "No temas fallar, Samantha. Hasta las mejores cazadoras entrenan mucho."
-];
+function iceMsgs(){
+  return [
+    "¡Los copos de nieve se forman en grupos iguales, igual que la multiplicación!",
+    `Respira hondo, ${playerName}. El hielo nunca tiene prisa, tú tampoco.`,
+    "¡Cada acierto se convierte en un cristal para tu corona!",
+    "Confío en ti. ¡Eres muy valiente!"
+  ];
+}
+function shadowMsgs(){
+  return [
+    "Las sombras solo se vencen con concentración, ¡como tú!",
+    "Cada acierto es una chispa de luz en la oscuridad.",
+    "¡Con cada tabla dominada, tu espada brilla más fuerte!",
+    `No temas fallar, ${playerName}. Hasta las mejores cazadoras entrenan mucho.`
+  ];
+}
 
 const TIPS = {
   1:  "Multiplicar por 1 no cambia nada. ¡El número se queda igual, como mirarse en un espejo!",
@@ -440,14 +600,12 @@ const LEVELS_TEMPLATE = [
   {n:9,  zone:'shadow', title:'Abismo Estelar',       monster:{name:'Serpiente de Niebla',   emoji:'🐍', boss:false}},
   {n:10, zone:'shadow', title:'Trono Final',          monster:{name:'Caos, el Mago de la Confusión', emoji:'🧙‍♂️', boss:true}},
 ];
-
 const ZONE_STYLE = {
   ice:    { bg:'linear-gradient(135deg, var(--ice-accent), var(--ice-deep))', tagBg:'var(--ice-accent)' },
   shadow: { bg:'linear-gradient(135deg, var(--shadow-3), var(--shadow-2))',   tagBg:'var(--shadow-2)' }
 };
 
 let LEVELS = LEVELS_TEMPLATE.map((l,i)=>({ ...l, status: i===0 ? 'unlocked':'locked', stars:0 }));
-let companionKey = null;
 
 let currentLevelIndex = null;
 let queue = [];
@@ -456,82 +614,94 @@ let perfectCount = 0;
 let totalFacts = 10;
 let awaitingNext = false;
 
-/* ============ ALMACENAMIENTO ============ */
-async function storageGet(key){
-  try{
-    const r = await window.storage.get(key, false);
-    return r ? JSON.parse(r.value) : null;
-  }catch(e){ return null; }
-}
-async function storageSet(key, value){
-  try{
-    await window.storage.set(key, JSON.stringify(value), false);
-    return true;
-  }catch(e){ console.error('No se pudo guardar el progreso', e); return false; }
-}
-async function storageDelete(key){
-  try{ await window.storage.delete(key, false); }catch(e){ /* puede no existir */ }
-}
-
-async function saveProgress(){
-  await storageSet(PROGRESS_KEY, {
-    levels: LEVELS.map(l=>({n:l.n, status:l.status, stars:l.stars})),
-    updatedAt: Date.now()
-  });
-}
-async function saveCompanion(key){
-  await storageSet(COMPANION_KEY, { companion:key });
-}
-
-function applyProgress(savedLevels){
-  savedLevels.forEach(sl=>{
-    const lvl = LEVELS.find(l=>l.n===sl.n);
-    if(lvl){ lvl.status = sl.status; lvl.stars = sl.stars; }
-  });
-}
-
 /* ============ INICIO ============ */
 async function init(){
-  const comp = await storageGet(COMPANION_KEY);
-  const prog = await storageGet(PROGRESS_KEY);
-
+  const cur = await storageGet('current-player');
   document.getElementById('loading-screen').classList.remove('active');
 
-  if(comp && comp.companion){
-    companionKey = comp.companion;
-    if(prog && Array.isArray(prog.levels)){
-      applyProgress(prog.levels);
+  if(cur && cur.slug){
+    const profile = await storageGet(`perfil-${cur.slug}`);
+    if(profile){
+      playerName = profile.name;
+      playerSlug = cur.slug;
+      companionKey = profile.companion;
+      soundOn = profile.soundOn !== false;
+      if(Array.isArray(profile.levels)) applyProgress(profile.levels);
+      document.getElementById('mute-btn').textContent = soundOn ? '🔊' : '🔇';
+      document.getElementById('player-tagline').textContent = `La aventura de ${playerName}`;
+      document.getElementById('main-subtitle').textContent =
+        `¡Bienvenido/a de nuevo, ${playerName}! ${COMPANIONS[companionKey].name} continúa la aventura contigo.`;
+      updateSettingsInfo();
+      renderMap();
+      return;
     }
-    updatePlayerBadges();
+  }
+  document.getElementById('name-screen').classList.add('active');
+  document.getElementById('name-field').focus();
+}
+
+const nameFieldEl = document.getElementById('name-field');
+if(nameFieldEl){
+  nameFieldEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') submitName(); });
+}
+
+async function submitName(){
+  const field = document.getElementById('name-field');
+  const val = field.value.trim();
+  if(!val){
+    document.getElementById('name-error').classList.add('show');
+    return;
+  }
+  document.getElementById('name-error').classList.remove('show');
+  sndClick();
+
+  playerName = val.slice(0,20);
+  playerSlug = slugify(playerName);
+  document.getElementById('player-tagline').textContent = `La aventura de ${playerName}`;
+
+  const existing = await storageGet(`perfil-${playerSlug}`);
+  await setCurrentPlayer();
+  document.getElementById('name-screen').classList.remove('active');
+
+  if(existing){
+    companionKey = existing.companion;
+    soundOn = existing.soundOn !== false;
+    if(Array.isArray(existing.levels)) applyProgress(existing.levels);
+    document.getElementById('mute-btn').textContent = soundOn ? '🔊' : '🔇';
     document.getElementById('main-subtitle').textContent =
-      `¡Bienvenida de nuevo, Samantha! ${COMPANIONS[companionKey].name} continúa la aventura contigo.`;
+      `¡Bienvenido/a de nuevo, ${playerName}! ${COMPANIONS[companionKey].name} continúa la aventura contigo.`;
+    updateSettingsInfo();
     renderMap();
   } else {
+    document.getElementById('companion-greeting').textContent = `¡Hola, ${playerName}!`;
     document.getElementById('companion-screen').classList.add('active');
   }
 }
 
-function updatePlayerBadges(){
-  document.getElementById('settings-companion').textContent =
-    companionKey ? `${COMPANIONS[companionKey].emoji} ${COMPANIONS[companionKey].name}` : '—';
+function updateSettingsInfo(){
+  document.getElementById('settings-name').textContent = playerName || '—';
+  document.getElementById('settings-companion').textContent = companionKey ? `${COMPANIONS[companionKey].emoji} ${COMPANIONS[companionKey].name}` : '—';
+  const t = document.getElementById('sound-toggle');
+  if(t) t.classList.toggle('on', soundOn);
 }
 
 async function chooseCompanion(key){
+  sndClick();
   companionKey = key;
-  await saveCompanion(key);
   document.getElementById('companion-screen').classList.remove('active');
   document.getElementById('story-companion-line').textContent =
-    `${COMPANIONS[key].name} te ha elegido como su ayudante, Samantha. Juntas recorrerán 10 misiones, una por cada tabla, sellando a las criaturas confundidas y devolviéndole la memoria al Reino.`;
+    `${COMPANIONS[key].name} te ha elegido como su ayudante, ${playerName}. Juntas recorrerán 10 misiones, una por cada tabla, sellando a las criaturas confundidas y devolviéndole la memoria al Reino.`;
   document.getElementById('story-screen').classList.add('active');
 }
 
 function beginMap(){
+  sndOpen();
   document.getElementById('story-screen').classList.remove('active');
   document.getElementById('main-subtitle').textContent =
-    `Samantha y ${COMPANIONS[companionKey].name} se embarcan en una aventura para derrotar a Caos.`;
-  updatePlayerBadges();
+    `${playerName} y ${COMPANIONS[companionKey].name} se embarcan en una aventura para derrotar a Caos.`;
+  updateSettingsInfo();
   renderMap();
-  saveProgress();
+  saveProfile();
 }
 
 /* ============ MAPA ============ */
@@ -574,11 +744,12 @@ function renderMap(){
 
   map.innerHTML = html;
   document.getElementById('star-count').textContent = LEVELS.reduce((a,l)=>a+l.stars,0);
-  document.getElementById('badge-count').textContent = LEVELS.filter(l=>l.status==='completed').length;
+  document.getElementById('piece-count').textContent = LEVELS.filter(l=>l.status==='completed').length;
 }
 
 /* ============ MISIÓN: INTRO ============ */
 function openMissionIntro(i){
+  sndOpen();
   currentLevelIndex = i;
   const lvl = LEVELS[i];
   const style = ZONE_STYLE[lvl.zone];
@@ -593,9 +764,9 @@ function openMissionIntro(i){
 
   let narrative;
   if(lvl.n === 10){
-    narrative = `Samantha, has llegado al Trono Final junto a ${comp.name}. Aquí espera Caos, el Mago de la Confusión. Solo si dominas la tabla del 10 podrás romper su hechizo y devolverle la memoria a todo el Reino.`;
+    narrative = `${playerName}, has llegado al Trono Final junto a ${comp.name}. Aquí espera Caos, el Mago de la Confusión. Solo si dominas la tabla del 10 podrás romper su hechizo y devolverle la memoria a todo el Reino.`;
   } else if(lvl.monster.boss){
-    narrative = `${comp.name} te advierte: "¡Cuidado, Samantha! ${lvl.monster.name} es el guardián de esta zona. Si dominas la tabla del ${lvl.n}, lo sellaremos juntas y el camino se abrirá."`;
+    narrative = `${comp.name} te advierte: "¡Cuidado, ${playerName}! ${lvl.monster.name} es el guardián de esta zona. Si dominas la tabla del ${lvl.n}, lo sellaremos juntas y el camino se abrirá."`;
   } else {
     narrative = `En ${lvl.title}, un ${lvl.monster.name} ha atrapado los números y los confundió. ${comp.name} te dice: "Si dominas la tabla del ${lvl.n}, podremos sellarlo y seguir avanzando."`;
   }
@@ -605,6 +776,7 @@ function openMissionIntro(i){
   document.getElementById('mission-screen').classList.add('active');
 }
 function closeMissionIntro(){
+  sndClick();
   document.getElementById('mission-screen').classList.remove('active');
 }
 
@@ -624,6 +796,7 @@ function buildQueue(table){
 }
 
 function startMission(){
+  sndClick();
   document.getElementById('mission-screen').classList.remove('active');
   const lvl = LEVELS[currentLevelIndex];
   const style = ZONE_STYLE[lvl.zone];
@@ -647,14 +820,16 @@ function startMission(){
   nextQuestion();
 }
 function toggleTip(){
+  sndClick();
   document.getElementById('inline-tip').classList.toggle('show');
 }
 function closeLevel(){
+  sndClick();
   document.getElementById('level-view').classList.remove('active');
   renderMap();
 }
 function setSpeech(zone){
-  const pool = zone==='ice' ? ICE_MSGS : SHADOW_MSGS;
+  const pool = zone==='ice' ? iceMsgs() : shadowMsgs();
   document.getElementById('char-speech').textContent = pool[Math.floor(Math.random()*pool.length)];
 }
 function renderProgress(){
@@ -680,6 +855,7 @@ function generateOptions(a,b){
 }
 
 function nextQuestion(){
+  sndClick();
   awaitingNext = false;
   document.getElementById('feedback-panel').classList.remove('show');
   document.getElementById('answer-line').style.display = 'none';
@@ -724,6 +900,7 @@ function handleAnswer(selected, btn){
   const nextBtn = document.getElementById('next-btn');
 
   if(selected===correct){
+    sndCorrect();
     panel.className = 'feedback-panel show good';
     title.textContent = currentFact.attempts===0 ? '¡Perfecto, a la primera! 🎉' : '¡Muy bien, ahora sí quedó clara! 🎉';
     text.textContent = `${currentFact.a} × ${currentFact.b} = ${correct}. ¡Ya sellaste un pedacito de la criatura confundida!`;
@@ -735,6 +912,7 @@ function handleAnswer(selected, btn){
     if(currentFact.attempts===0) perfectCount++;
     markDotDone();
   } else {
+    sndWrong();
     btn.classList.add('wrong');
     currentFact.attempts++;
     panel.className = 'feedback-panel show oops';
@@ -779,17 +957,29 @@ async function finishLevel(){
   else if(perfectCount>=6) stars = 2;
 
   lvl.stars = Math.max(lvl.stars, stars);
+  const wasAlreadyCompleted = lvl.status==='completed';
   lvl.status = 'completed';
   if(currentLevelIndex+1 < LEVELS.length && LEVELS[currentLevelIndex+1].status==='locked'){
     LEVELS[currentLevelIndex+1].status = 'unlocked';
   }
-  await saveProgress();
+  await saveProfile();
 
   document.getElementById('level-view').classList.remove('active');
-  showReward(lvl, stars);
+  showReward(lvl, stars, wasAlreadyCompleted);
 }
 
-function showReward(lvl, stars){
+function setPieceTile(el, levelNumber){
+  const idx = levelNumber - 1;
+  const col = idx % PUZZLE_COLS;
+  const row = Math.floor(idx / PUZZLE_COLS);
+  el.style.backgroundImage = `url("${PUZZLE_IMG_URI}")`;
+  el.style.backgroundSize = `${PUZZLE_COLS*100}% ${PUZZLE_ROWS*100}%`;
+  const posX = PUZZLE_COLS>1 ? (col/(PUZZLE_COLS-1))*100 : 0;
+  const posY = PUZZLE_ROWS>1 ? (row/(PUZZLE_ROWS-1))*100 : 0;
+  el.style.backgroundPosition = `${posX}% ${posY}%`;
+}
+
+function showReward(lvl, stars, wasAlreadyCompleted){
   const comp = COMPANIONS[companionKey];
   const isBoss = lvl.monster.boss;
   const isFinal = lvl.n === 10;
@@ -799,20 +989,27 @@ function showReward(lvl, stars){
   document.getElementById('reward-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
   document.getElementById('reward-title').textContent = isFinal ? '¡Caos ha sido derrotado!' : `¡Tabla del ${lvl.n} dominada!`;
 
+  const pieceEl = document.getElementById('reward-piece');
+  setPieceTile(pieceEl, lvl.n);
+  document.getElementById('reward-piece-caption').textContent = wasAlreadyCompleted
+    ? `Ya tenías la pieza ${lvl.n} del rompecabezas.`
+    : `¡Ganaste la pieza ${lvl.n} del rompecabezas del Reino!`;
+
   let msg;
   if(isFinal){
-    msg = `¡Lo lograste, Samantha! Junto a ${comp.name}, sellaste a Caos y todos los números del Reino recuperaron su memoria. ¡Eres una verdadera maestra de las tablas de multiplicar!`;
+    msg = `¡Lo lograste, ${playerName}! Junto a ${comp.name}, sellaste a Caos y todos los números del Reino recuperaron su memoria. ¡El rompecabezas está completo! Eres una verdadera maestra de las tablas de multiplicar.`;
   } else if(lvl.n===5){
     const other = companionKey==='ice' ? COMPANIONS.shadow : COMPANIONS.ice;
     msg = `¡Has vencido al Centinela de Hielo! El Reino de Hielo está a salvo. Ahora ${other.name} se une a la aventura para cruzar juntas al Reino de Sombras.`;
   } else {
     const nextLvl = LEVELS[currentLevelIndex+1];
-    msg = `¡Has sellado a ${lvl.monster.emoji} ${lvl.monster.name}! ${comp.name} está muy orgullosa de ti, Samantha. El camino hacia ${nextLvl ? nextLvl.title : 'la siguiente zona'} se abre.`;
+    msg = `¡Has sellado a ${lvl.monster.emoji} ${lvl.monster.name}! ${comp.name} está muy orgullosa de ti, ${playerName}. El camino hacia ${nextLvl ? nextLvl.title : 'la siguiente zona'} se abre.`;
   }
   document.getElementById('reward-text').textContent = msg;
 
   const view = document.getElementById('reward-view');
   view.classList.add('active');
+  if(isFinal){ sndVictory(); } else { sndLevelUp(); }
   launchConfetti(isFinal);
   renderMap();
 }
@@ -834,36 +1031,85 @@ function launchConfetti(big){
 }
 
 function replayLevel(){
+  sndClick();
   document.getElementById('reward-view').classList.remove('active');
   openMissionIntro(currentLevelIndex);
 }
 function backToMap(){
+  sndClick();
   document.getElementById('reward-view').classList.remove('active');
   renderMap();
 }
 
+/* ============ ROMPECABEZAS ============ */
+function openPuzzle(){
+  sndOpen();
+  document.getElementById('reward-view').classList.remove('active');
+  const grid = document.getElementById('puzzle-grid');
+  grid.innerHTML = '';
+  const completedCount = LEVELS.filter(l=>l.status==='completed').length;
+  document.getElementById('puzzle-progress-text').textContent =
+    completedCount===10 ? `¡Rompecabezas completo, ${playerName}! 🎉` : `${completedCount} de 10 piezas encontradas`;
+
+  LEVELS.forEach(lvl=>{
+    const tile = document.createElement('div');
+    if(lvl.status==='completed'){
+      tile.className = 'puzzle-tile revealed';
+      setPieceTile(tile, lvl.n);
+    } else {
+      tile.className = 'puzzle-tile locked';
+      tile.textContent = lvl.n;
+    }
+    grid.appendChild(tile);
+  });
+
+  document.getElementById('puzzle-screen').classList.add('active');
+}
+function closePuzzle(){
+  sndClick();
+  document.getElementById('puzzle-screen').classList.remove('active');
+}
+
 /* ============ AJUSTES ============ */
 function openSettings(){
-  updatePlayerBadges();
+  sndOpen();
+  updateSettingsInfo();
   document.getElementById('settings-screen').classList.add('active');
 }
 function closeSettings(){
+  sndClick();
   document.getElementById('settings-screen').classList.remove('active');
 }
 function startChangeCompanion(){
   closeSettings();
+  document.getElementById('companion-greeting').textContent = `¡Hola, ${playerName}!`;
   document.getElementById('companion-screen').classList.add('active');
+}
+async function startSwitchPlayer(){
+  closeSettings();
+  await storageSet('current-player', null);
+  playerName = '';
+  playerSlug = '';
+  companionKey = null;
+  LEVELS = LEVELS_TEMPLATE.map((l,i)=>({ ...l, status: i===0 ? 'unlocked':'locked', stars:0 }));
+  document.getElementById('player-tagline').textContent = 'Mapa mágico de multiplicación';
+  document.getElementById('name-field').value = '';
+  document.getElementById('name-screen').classList.add('active');
+  document.getElementById('name-field').focus();
 }
 function askResetConfirm(){
   closeSettings();
+  document.getElementById('confirm-text').textContent =
+    `Vas a borrar todas tus estrellas, misiones y piezas del rompecabezas, ${playerName}. ¿Quieres empezar el camino desde cero?`;
   document.getElementById('confirm-screen').classList.add('active');
 }
 function closeConfirm(){
+  sndClick();
   document.getElementById('confirm-screen').classList.remove('active');
 }
 async function doReset(){
   LEVELS = LEVELS_TEMPLATE.map((l,i)=>({ ...l, status: i===0 ? 'unlocked':'locked', stars:0 }));
-  await saveProgress();
+  await saveProfile();
   document.getElementById('confirm-screen').classList.remove('active');
   renderMap();
 }
