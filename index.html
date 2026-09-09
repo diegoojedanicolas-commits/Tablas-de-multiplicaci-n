@@ -549,11 +549,30 @@ function slugify(name){
   return name.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,30) || 'jugador';
 }
+/* Si el juego corre dentro de Claude, usamos su almacenamiento persistente (window.storage).
+   Si corre como página independiente (por ejemplo alojada en GitHub Pages), usamos
+   localStorage del navegador, que guarda los datos en ese dispositivo. */
+const STORAGE_PREFIX = 'tablas-magicas:';
+const hasClaudeStorage = (typeof window !== 'undefined') && window.storage && typeof window.storage.get === 'function';
 async function storageGet(key){
-  try{ const r = await window.storage.get(key, false); return r ? JSON.parse(r.value) : null; }catch(e){ return null; }
+  if(hasClaudeStorage){
+    try{ const r = await window.storage.get(key, false); return r ? JSON.parse(r.value) : null; }
+    catch(e){ return null; }
+  }
+  try{
+    const raw = window.localStorage.getItem(STORAGE_PREFIX + key);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
 }
 async function storageSet(key, value){
-  try{ await window.storage.set(key, JSON.stringify(value), false); return true; }catch(e){ console.error('No se pudo guardar', e); return false; }
+  if(hasClaudeStorage){
+    try{ await window.storage.set(key, JSON.stringify(value), false); return true; }
+    catch(e){ console.error('No se pudo guardar', e); return false; }
+  }
+  try{
+    window.localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+    return true;
+  }catch(e){ console.error('No se pudo guardar en este navegador', e); return false; }
 }
 async function saveProfile(){
   await storageSet(`perfil-${playerSlug}`, {
